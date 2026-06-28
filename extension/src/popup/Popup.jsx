@@ -144,15 +144,11 @@ export default function Popup() {
               isDarkPage = window.matchMedia('(prefers-color-scheme: dark)').matches;
             }
 
-            if (prefs.appearance === "auto") {
-              setResolvedTheme(
-                  window.matchMedia("(prefers-color-scheme: dark)").matches
-                      ? "dark"
-                      : "light"
-              );
+            if (prefs.appearance === 'auto') {
+              setResolvedTheme(isDarkPage ? 'light' : 'dark');
             } else {
-              setResolvedTheme(prefs.appearance);
-          }
+              setResolvedTheme(prefs.appearance || 'light');
+            }
           }
         );
       });
@@ -164,6 +160,10 @@ export default function Popup() {
       setResolvedTheme(prefs.appearance || 'light');
     }
   }, [prefs.appearance]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', resolvedTheme);
+  }, [resolvedTheme]);
 
   const handleToggle = (key, messageType) => (newValue) => {
     updatePref(key, newValue);
@@ -187,10 +187,8 @@ export default function Popup() {
     : 0;
 
   return (
-      <div
-        className="neuroadapt-popup flex flex-col gap-6 w-[380px] bg-bg border border-border rounded-lg text-primary font-sans p-6"
-        data-theme={resolvedTheme}
-      >      {/* ── Header ── */}
+    <div className="neuroadapt-popup flex flex-col gap-6 w-[380px] bg-bg border border-border rounded-lg text-primary font-sans p-6">
+      {/* ── Header ── */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
@@ -202,7 +200,7 @@ export default function Popup() {
           </div>
         </div>
         <button
-          onClick={() => window.open(import.meta.env.VITE_DASHBOARD_URL || "http://localhost:5173", "_blank")}
+          onClick={() => window.open(import.meta.env.VITE_DASHBOARD_URL, "_blank")}
           className="px-[14px] py-[6px] rounded-sm border border-brand bg-transparent text-brand text-[13px] font-medium hover:bg-brand-soft transition-colors"
         >
           {user ? 'Dashboard' : 'Sign in'}
