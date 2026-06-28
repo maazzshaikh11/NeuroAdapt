@@ -1,0 +1,274 @@
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;/* ── Base ─────────────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply m-0 min-h-screen;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+  }
+
+  :root {
+    --sidebar-width: 260px;
+  }
+
+  /* Remove default focus outline; we apply our own */
+  :focus {
+    outline: none;
+  }
+}
+
+/* ── Component Classes ────────────────────────────────────────────────────── */
+@layer components {
+  .card {
+    @apply shadow-card;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           text-sm font-semibold
+           px-4 py-2.5
+           transition-all duration-fast
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-brand focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    border-radius: var(--radius-md);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           text-sm font-medium
+           px-4 py-2.5
+           transition-all duration-fast
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-brand focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(0,0,0,0.02);
+  }
+  .btn-secondary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2
+           bg-red-600 hover:bg-red-700 active:bg-red-800
+           text-white text-sm font-semibold
+           px-4 py-2.5 rounded-lg
+           transition-colors duration-150
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-red-500 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full
+           px-4 py-3
+           text-sm
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-brand focus-visible:border-transparent;
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .input-field::placeholder {
+    color: var(--color-text-muted);
+  }
+  .input-field:focus {
+    border-color: var(--color-brand);
+  }
+
+  .section-title {
+    @apply text-lg font-semibold mb-4;
+    color: var(--color-text-primary);
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5
+           text-xs font-medium rounded-full;
+  }
+
+  .badge-indigo {
+    @apply badge bg-indigo-100 text-indigo-700;
+  }
+
+  .badge-teal {
+    @apply badge bg-teal-100 text-teal-700;
+  }
+
+  .badge-green {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-red {
+    @apply badge bg-red-100 text-red-700;
+  }
+
+  .badge-slate {
+    @apply badge bg-slate-100 text-slate-600;
+  }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, #4f46e5 0%, #0d9488 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-indigo-teal {
+    background: linear-gradient(135deg, #4f46e5 0%, #0d9488 100%);
+  }
+
+  /* Top accent bar — add relative + overflow-hidden to parent */
+  .gradient-top-bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #0d9488);
+    border-radius: 12px 12px 0 0;
+  }
+}
+
+/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* slate-400 */
+}
+
+/* ── Skeleton / Shimmer ──────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #F3F0EA 0%,
+    #E8E2D6 40%,
+    #F3F0EA 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: var(--radius-md);
+}
+
+/* ── Range input cross-browser ───────────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4f46e5;
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.4);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.5);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #4f46e5;
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.4);
+  cursor: pointer;
+}
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px #e0e7ff, 0 1px 4px rgba(79, 70, 229, 0.4);
+}
+
+/* ── Reduced motion — non-negotiable override ────────────────────────────── */
+/* Must come last so it overrides all animation/transition declarations above. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Scroll-reveal (dashboard-only, added by IntersectionObserver) ────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance, 20px));
+  transition:
+    opacity var(--duration-reveal, 600ms) var(--ease-reveal, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform var(--duration-reveal, 600ms) var(--ease-reveal, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays for sibling reveal elements */
+.reveal:nth-child(1) { transition-delay: 0ms; }
+.reveal:nth-child(2) { transition-delay: 80ms; }
+.reveal:nth-child(3) { transition-delay: 160ms; }
+.reveal:nth-child(4) { transition-delay: 240ms; }

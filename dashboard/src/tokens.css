@@ -1,0 +1,113 @@
+:root {
+  /* Surfaces */
+  --color-bg: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-border: #E8E2D6;
+  --color-border-strong: #D6CFC0;
+
+  /* Text */
+  --color-text-primary: #2B2B28;
+  --color-text-secondary: #5F5E5A;
+  --color-text-muted: #8A8579;
+
+  /* Brand */
+  --color-brand: #1B6B5A;
+  --color-brand-hover: #155847;
+  --color-brand-active: #0F4636;
+  --color-brand-soft: #E1F0EA;
+  --color-on-brand: #FFFFFF;
+
+  /* Accent */
+  --color-accent: #E2664B;
+  --color-accent-hover: #C8523A;
+  --color-on-accent: #FFFFFF;
+
+  /* Semantic */
+  --color-success: #3B6D11;
+  --color-warning: #854F0B;
+  --color-error: #A32D2D;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(43,43,40,0.04), 0 4px 12px rgba(43,43,40,0.05);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-standard: 200ms;
+
+  /* Motion — scroll-reveal additions (dashboard-only) */
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-reveal: 600ms;
+  --duration-counter: 1200ms;
+  --reveal-distance: 20px;
+
+  /* Type */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Source Serif 4', Georgia, serif;
+}
+
+/* Themes */
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-surface: #1E1E1E;
+  --color-border: #333333;
+  --color-border-strong: #444444;
+
+  --color-text-primary: #E0E0E0;
+  --color-text-secondary: #AAAAAA;
+  --color-text-muted: #777777;
+
+  --color-brand: #2B9B82;
+  --color-brand-hover: #35B59A;
+  --color-brand-active: #217D67;
+  --color-brand-soft: #1B3B33;
+  --color-on-brand: #FFFFFF;
+}
+
+[data-theme="yellow"] {
+  --color-bg: #FEF9C3;
+  --color-surface: #FEF08A;
+  --color-border: #FDE047;
+  --color-border-strong: #FACC15;
+
+  --color-text-primary: #422006;
+  --color-text-secondary: #713F12;
+  --color-text-muted: #854D0E;
+
+  --color-brand: #854D0E;
+  --color-brand-hover: #713F12;
+  --color-brand-active: #422006;
+  --color-brand-soft: #FEF08A;
+  --color-on-brand: #FEF9C3;
+}
+
+[data-theme="cream"] {
+  --color-bg: #FFFBF0;
+  --color-surface: #FFF5E1;
+  --color-border: #EEDDC0;
+  --color-border-strong: #DDBB99;
+
+  --color-text-primary: #3A3226;
+  --color-text-secondary: #5A4E3C;
+  --color-text-muted: #8A7B66;
+
+  --color-brand: #8A5A44;
+  --color-brand-hover: #774936;
+  --color-brand-active: #5E3A2A;
+  --color-brand-soft: #F5E6E1;
+  --color-on-brand: #FFFFFF;
+}

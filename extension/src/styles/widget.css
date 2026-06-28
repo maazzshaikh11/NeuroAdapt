@@ -1,0 +1,371 @@
+
+/* ==========================================================================
+   NeuroAdapt — Widget Styles
+   ========================================================================== */
+
+.neuroadapt-widget,
+.neuroadapt-widget *,
+.neuroadapt-widget *::before,
+.neuroadapt-widget *::after {
+	box-sizing: border-box;
+	font-family: var(--font-ui, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+	/* Hard-reset inherited properties so host-page CSS cannot leak in */
+	mix-blend-mode: normal;
+	-webkit-text-fill-color: unset;
+}
+
+.neuroadapt-widget {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	z-index: 999999;
+	display: flex;
+	align-items: flex-end;
+	justify-content: flex-end;
+	pointer-events: none;
+}
+
+.neuroadapt-widget__container {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Panel (flyout menu)
+   ========================================================================== */
+
+.neuroadapt-panel {
+	position: absolute;
+	right: 64px; /* 52px trigger + 12px gap */
+	bottom: 0;
+	width: 330px;
+	padding: 14px;
+	border-radius: var(--radius-lg, 20px);
+	background: var(--color-surface, #FFFFFF) !important;
+	color: var(--color-text-primary, #2B2B28) !important;
+	border: 1px solid var(--color-border, #E8E2D6);
+	box-shadow: 0 2px 8px rgba(0,0,0,.08);
+	opacity: 0;
+	transform: translateX(10px) scale(0.95);
+    transform-origin: bottom right;
+	pointer-events: none;
+	transition: opacity var(--duration-standard, 200ms) var(--ease-standard, ease), transform var(--duration-standard, 200ms) var(--ease-standard, ease);
+    display: flex;
+    flex-direction: column;
+}
+
+.neuroadapt-panel--open {
+	opacity: 1;
+	transform: translateX(0) scale(1);
+	pointer-events: auto;
+}
+
+/* Action buttons and rows
+   ========================================================================== */
+
+.neuroadapt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-text-primary, #2B2B28) !important;
+}
+
+.neuroadapt-row.secondary-card {
+    padding: 10px 4px;
+    border-top: 1px solid var(--color-divider);
+}
+
+/* Make sure the first toggle row has no top border, or that the divider looks okay below primary card */
+
+.neuroadapt-row.primary-card {
+    background: var(--color-brand, #1B6B5A) !important;
+    color: var(--color-on-brand, #FFFFFF) !important;
+    -webkit-text-fill-color: var(--color-on-brand, #FFFFFF) !important;
+    border-radius: var(--radius-md, 12px);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    transition: background-color var(--duration-fast, 120ms) var(--ease-standard, ease);
+}
+
+.neuroadapt-row.primary-card:hover {
+    background-color: var(--color-brand-hover, #155847) !important;
+}
+.neuroadapt-row.primary-card:active {
+    transform: scale(0.98);
+}
+
+.neuroadapt-row-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.neuroadapt-icon-box {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary, #5F5E5A);
+}
+
+/* SVG icons inside secondary rows */
+.neuroadapt-icon-box svg {
+    stroke: currentColor;
+    fill: none;
+}
+
+.neuroadapt-row.primary-card .neuroadapt-icon-box {
+    color: var(--color-on-brand, #FFFFFF) !important;
+}
+
+/* SVG icons inside the primary-card (Simplify) must always be white */
+.neuroadapt-row.primary-card .neuroadapt-icon-box svg {
+    stroke: var(--color-on-brand, #FFFFFF) !important;
+    fill: none !important;
+    color: var(--color-on-brand, #FFFFFF) !important;
+}
+
+.neuroadapt-label-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    min-width: 0;
+}
+
+.neuroadapt-row-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary, #2B2B28) !important;
+}
+
+.neuroadapt-row.primary-card .neuroadapt-row-label {
+    color: var(--color-on-brand, #FFFFFF) !important;
+    -webkit-text-fill-color: var(--color-on-brand, #FFFFFF) !important;
+    font-size: 14px;
+}
+
+.neuroadapt-row-status {
+    font-size: 12px;
+    color: var(--color-text-muted, #8A8579) !important;
+    -webkit-text-fill-color: var(--color-text-muted, #8A8579) !important;
+    margin-top: 2px;
+}
+
+/* Toggle Switch
+   ========================================================================== */
+.neuroadapt-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background-color: var(--color-toggle-off-bg);
+    border: 1px solid var(--color-toggle-off-border);
+    border-radius: var(--radius-pill);
+    transition: background-color var(--duration-standard) var(--ease-standard), border-color var(--duration-standard) var(--ease-standard);
+    pointer-events: none;
+}
+
+.neuroadapt-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background-color: var(--color-toggle-off-thumb);
+    border-radius: 50%;
+    transition: transform var(--duration-standard) var(--ease-standard);
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.neuroadapt-row.active .neuroadapt-toggle {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+}
+
+.neuroadapt-row.active .neuroadapt-toggle::after {
+    transform: translateX(16px);
+    background-color: var(--color-on-brand);
+}
+
+
+.neuroadapt-trigger {
+	width: auto;
+	height: auto;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: none;
+	padding: 0;
+	pointer-events: auto;
+	transition: transform var(--duration-fast) var(--ease-standard);
+    position: relative;
+}
+
+.neuroadapt-trigger:hover {
+	transform: scale(1.1);
+}
+
+
+
+
+
+.neuroadapt-trigger--active {
+}
+
+.neuroadapt-trigger__label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Bionic Reading mode
+   ========================================================================== */
+
+.neuroadapt-bionic {
+	font-weight: 700 !important;
+}
+
+/* Focus Mode
+   ========================================================================== */
+
+.neuroadapt-focus-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 999990;
+	overflow-y: auto;
+	transition: opacity 300ms ease;
+}
+
+.neuroadapt-focus-content {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 2rem;
+	line-height: 1.7;
+	font-size: 18px;
+}
+
+/* Ensure images inside focus mode scale properly */
+.neuroadapt-focus-content img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* Keep the widget above the focus overlay */
+.neuroadapt-widget {
+	z-index: 999999 !important;
+}
+
+/* Simplify — Loading / disabled button state
+   ========================================================================== */
+
+.neuroadapt-button--loading {
+	opacity: 0.65;
+	cursor: wait;
+	pointer-events: none;
+}
+
+.neuroadapt-button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Simplify — Highlighted replacement span
+   ========================================================================== */
+
+.neuroadapt-simplified {
+	background: rgba(16, 185, 129, 0.12);
+	border-radius: 4px;
+	padding: 1px 3px;
+	transition: background-color 300ms ease;
+}
+
+.neuroadapt-simplify-container {
+	display: inline;
+}
+
+/* Simplify — "Show Original" undo button
+   ========================================================================== */
+
+.neuroadapt-undo-btn {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 2px 8px;
+	border: 1px solid rgba(79, 70, 229, 0.25);
+	border-radius: 6px;
+	background: #f8fafc;
+	color: #4f46e5;
+	font-size: 11px;
+	font-weight: 600;
+	font-family: Inter, system-ui, -apple-system, sans-serif;
+	cursor: pointer;
+	vertical-align: baseline;
+	line-height: 1.5;
+	transition: background-color 150ms ease, border-color 150ms ease,
+		box-shadow 150ms ease;
+}
+
+.neuroadapt-undo-btn:hover {
+	background: #eef2ff;
+	border-color: rgba(79, 70, 229, 0.4);
+	box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.neuroadapt-undo-btn:focus-visible {
+	outline: 2px solid rgba(79, 70, 229, 0.5);
+	outline-offset: 1px;
+}
+
+/* Toast notifications
+   ========================================================================== */
+
+.neuroadapt-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 24px;
+	z-index: 1000000;
+	max-width: 380px;
+	padding: 12px 20px;
+	border-radius: 12px;
+	font-family: Inter, system-ui, -apple-system, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.45;
+	color: #ffffff;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+	opacity: 0;
+	transform: translateY(12px);
+	transition: opacity 250ms ease, transform 250ms ease;
+	pointer-events: none;
+}
+
+.neuroadapt-toast--visible {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.neuroadapt-toast--info {
+	background: #334155;
+}
+
+.neuroadapt-toast--success {
+	background: #059669;
+}
+
+.neuroadapt-toast--error {
+	background: #dc2626;
+}
