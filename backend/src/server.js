@@ -14,9 +14,10 @@ const errorHandler = require('./middleware/errorHandler');
 const connectDB = require('./config/db');
 const path = require('path');
 
-// ─── App Instantiation ────────────────────────────────────────────────────────
 const app = express();
 
+// Required for Render + express-rate-limit
+app.set('trust proxy', 1);
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 
 // 1. Helmet
