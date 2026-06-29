@@ -2,12 +2,6 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-console.log("================================");
-console.log("VITE_API_BASE_URL =", import.meta.env.VITE_API_BASE_URL);
-console.log("BASE_URL =", BASE_URL);
-console.log("MODE =", import.meta.env.MODE);
-console.log("================================");
-
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside AuthContext.Provider");
