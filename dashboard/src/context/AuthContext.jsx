@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-const AuthContext = createContext(null);
-
-// Single source of truth for the API base URL.
-// Falls back to "" so the Vite dev-proxy (/api → localhost:5001) still works locally.
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+console.log("================================");
+console.log("VITE_API_BASE_URL =", import.meta.env.VITE_API_BASE_URL);
+console.log("BASE_URL =", BASE_URL);
+console.log("MODE =", import.meta.env.MODE);
+console.log("================================");
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
