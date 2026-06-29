@@ -2,6 +2,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { usePreferences } from './hooks/usePreferences';
 import { getProfile, getAnalyticsOverview } from '../utils/api';
 
+const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'https://neuro-adapt-eight.vercel.app';
+
+/**
+ * Returns true if the URL belongs to a restricted origin where
+ * chrome.scripting.executeScript is not allowed.
+ */
+function isRestrictedUrl(url) {
+  if (!url) return true;
+  return (
+    url.startsWith('chrome://') ||
+    url.startsWith('chrome-extension://') ||
+    url.startsWith('about:') ||
+    url.startsWith('devtools://') ||
+    url.startsWith('view-source:') ||
+    url.startsWith('chrome-search://') ||
+    url.startsWith('edge://')
+  );
+}
+
 export default function Popup() {
   const [prefs, updatePref, isLoading] = usePreferences();
   const [user, setUser] = useState(null);
@@ -93,64 +112,84 @@ export default function Popup() {
       }
 
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const activeTab = tabs[0];
-        if (!activeTab || !activeTab.id || activeTab.url?.startsWith('chrome://') || activeTab.url?.startsWith('about:')) {
+        if (chrome.runtime.lastError) {
           const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           setResolvedTheme(prefs.appearance === 'auto' ? (isSystemDark ? 'light' : 'dark') : prefs.appearance);
           return;
         }
 
-        chrome.scripting.executeScript(
-          {
-            target: { tabId: activeTab.id },
-            func: () => {
-              const getBgColor = () => {
-                let el = document.body;
-                while (el) {
-                  const bg = window.getComputedStyle(el).backgroundColor;
-                  if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
-                    return bg;
+        const activeTab = tabs[0];
+        if (!activeTab || !activeTab.id || isRestrictedUrl(activeTab.url)) {
+          const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setResolvedTheme(prefs.appearance === 'auto' ? (isSystemDark ? 'light' : 'dark') : prefs.appearance);
+          return;
+        }
+
+        try {
+          chrome.scripting.executeScript(
+            {
+              target: { tabId: activeTab.id },
+              func: () => {
+                const getBgColor = () => {
+                  let el = document.body;
+                  while (el) {
+                    const bg = window.getComputedStyle(el).backgroundColor;
+                    if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+                      return bg;
+                    }
+                    el = el.parentElement;
                   }
-                  el = el.parentElement;
-                }
-                return 'rgb(255, 255, 255)';
-              };
-              return {
-                bgColor: getBgColor(),
-                prefersDark: window.matchMedia('(prefers-color-scheme: dark)').matches
-              };
-            }
-          },
-          (results) => {
-            let isDarkPage = false;
-            if (results && results[0] && results[0].result) {
-              const { bgColor, prefersDark } = results[0].result;
-              const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-              if (match) {
-                const r = parseInt(match[1], 10);
-                const g = parseInt(match[2], 10);
-                const b = parseInt(match[3], 10);
-                const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
-                if (a >= 0.1) {
-                  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-                  isDarkPage = brightness < 128;
+                  return 'rgb(255, 255, 255)';
+                };
+                return {
+                  bgColor: getBgColor(),
+                  prefersDark: window.matchMedia('(prefers-color-scheme: dark)').matches
+                };
+              }
+            },
+            (results) => {
+              // Defensive: check runtime.lastError to prevent
+              // "Frame with ID 0 is showing error page" errors
+              if (chrome.runtime.lastError) {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setResolvedTheme(prefs.appearance === 'auto' ? (isSystemDark ? 'light' : 'dark') : prefs.appearance);
+                return;
+              }
+
+              let isDarkPage = false;
+              if (results && results[0] && results[0].result) {
+                const { bgColor, prefersDark } = results[0].result;
+                const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+                if (match) {
+                  const r = parseInt(match[1], 10);
+                  const g = parseInt(match[2], 10);
+                  const b = parseInt(match[3], 10);
+                  const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
+                  if (a >= 0.1) {
+                    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                    isDarkPage = brightness < 128;
+                  } else {
+                    isDarkPage = prefersDark;
+                  }
                 } else {
                   isDarkPage = prefersDark;
                 }
               } else {
-                isDarkPage = prefersDark;
+                isDarkPage = window.matchMedia('(prefers-color-scheme: dark)').matches;
               }
-            } else {
-              isDarkPage = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
 
-            if (prefs.appearance === 'auto') {
-              setResolvedTheme(isDarkPage ? 'light' : 'dark');
-            } else {
-              setResolvedTheme(prefs.appearance || 'light');
+              if (prefs.appearance === 'auto') {
+                setResolvedTheme(isDarkPage ? 'light' : 'dark');
+              } else {
+                setResolvedTheme(prefs.appearance || 'light');
+              }
             }
-          }
-        );
+          );
+        } catch {
+          // Fallback if chrome.scripting.executeScript throws
+          const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setResolvedTheme(prefs.appearance === 'auto' ? (isSystemDark ? 'light' : 'dark') : prefs.appearance);
+        }
       });
     };
 
@@ -200,7 +239,7 @@ export default function Popup() {
           </div>
         </div>
         <button
-          onClick={() => window.open(import.meta.env.VITE_DASHBOARD_URL, "_blank")}
+          onClick={() => chrome.tabs.create({ url: DASHBOARD_URL })}
           className="px-[14px] py-[6px] rounded-sm border border-brand bg-transparent text-brand text-[13px] font-medium hover:bg-brand-soft transition-colors"
         >
           {user ? 'Dashboard' : 'Sign in'}
@@ -342,7 +381,7 @@ export default function Popup() {
 
       {/* ── Footer ── */}
       <div className="shrink-0 pt-3.5 border-t border-border flex justify-between items-center">
-        <span className="text-[11px] text-muted">NeuroAdapt v1.0.0</span>
+        <span className="text-[11px] text-muted">NeuroAdapt v{chrome.runtime.getManifest().version}</span>
         <button className="text-muted hover:text-primary transition-colors p-1" aria-label="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" /></svg>
         </button>
