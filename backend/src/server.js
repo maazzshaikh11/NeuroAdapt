@@ -30,8 +30,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // Static uploads
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'))));
-
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 // Rate limiting
 // app.use('/api/auth', authLimiter);
 app.use('/api/simplify', simplifyLimiter);
