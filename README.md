@@ -117,7 +117,7 @@ VITE_DASHBOARD_URL=
 
 # Authors
 
-- Team DSY
+Team DSY:
 - Muaz Shaikh
 - Ashokkumar Bhati
 - Piyush Ghadge
