@@ -1,11 +1,9 @@
 'use strict';
 
 // ─── Load environment variables FIRST ─────────────────────────────────────────
-// dotenv must be called before any other require() that reads process.env.
-// This is especially important for MONGODB_URI used in connectDB().
 require('dotenv').config();
 
-const express  = require('express');
+const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const corsOptions = require('./config/cors');
@@ -18,26 +16,51 @@ const app = express();
 
 // Required for Render + express-rate-limit
 app.set('trust proxy', 1);
+
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 
-// 1. Helmet
+// Security headers
 app.use(helmet());
 
-// 2. CORS
+// CORS
 app.use(cors(corsOptions));
 
-// 3. express.json
-// Parse incoming JSON bodies (for POST/PUT request payloads).
-// Limit: 1mb — prevents trivially large payload attacks.
+// Parse request bodies
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static uploads
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Static uploads
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'))));
 
-// 4. Rate Limiters
-// In the future: app.use('/auth', authLimiter);
+// Rate limiting
+// app.use('/api/auth', authLimiter);
 app.use('/api/simplify', simplifyLimiter);
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Root Endpoint
+// Visiting https://neuroadapt-backend.onrender.com/
+// will display API information instead of a 404.
+// ──────────────────────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    success: true,
+    name: 'NeuroAdapt Backend API',
+    version: '1.0.0',
+    status: 'Running',
+    message: 'Welcome to the NeuroAdapt Backend API.',
+    dashboard: 'https://neuro-adapt-eight.vercel.app',
+    documentation: 'https://github.com/maazzshaikh11/NeuroAdapt',
+    health: '/health',
+    endpoints: {
+      register: '/api/auth/register',
+      login: '/api/auth/login',
+      profile: '/api/profile',
+      simplify: '/api/simplify',
+      analytics: '/api/analytics',
+      usage: '/api/usage'
+    }
+  });
+});
 
 // ─── Health Check Endpoint ───────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
@@ -49,13 +72,11 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// ─── API Routes (5. routes) ───────────────────────────────────────────────────
-// Routes will be mounted here as they are implemented in subsequent tickets.
-// Example (added when Ticket 2.x is implemented):
-const authRoutes     = require('./routes/auth.routes');
-const profileRoutes  = require('./routes/profile.routes');
+// ─── API Routes ───────────────────────────────────────────────────────────────
+const authRoutes = require('./routes/auth.routes');
+const profileRoutes = require('./routes/profile.routes');
 const simplifyRoutes = require('./routes/simplify.routes');
-const usageRoutes    = require('./routes/usage.routes');
+const usageRoutes = require('./routes/usage.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 
 app.use('/api/auth', authRoutes);
@@ -64,26 +85,23 @@ app.use('/api/simplify', simplifyRoutes);
 app.use('/api/usage', usageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// ─── 404 Handler (6. 404 handler) ────────────────────────────────────────────
-// Catches any request that didn't match a defined route.
+// ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
-    code:    'NOT_FOUND',
+    code: 'NOT_FOUND',
     message: 'The requested endpoint does not exist.',
   });
 });
 
-// ─── Global Error Handler (7. global error handler) ───────────────────────────
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(errorHandler);
 
-// ─── Bootstrap — Connect DB then Start Server ─────────────────────────────────
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 (async () => {
   try {
-    // connectDB() will process.exit(1) if the connection fails.
-    // The server never starts listening without a healthy DB connection.
     await connectDB();
 
     app.listen(PORT, () => {
@@ -92,11 +110,9 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
       );
     });
   } catch (err) {
-    // Catch block handles any unexpected error not caught inside connectDB().
     console.error('[Server] ❌ Failed to start:', err.message);
     process.exit(1);
   }
 })();
 
-// Export app for future test use (e.g. supertest in Ticket 10.x)
 module.exports = app;
